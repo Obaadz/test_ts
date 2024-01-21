@@ -8,7 +8,7 @@ import getDataFromToken from "./getDataFromToken.js";
 export default async (token: string) => {
   const verifiedTokenData = getDataFromToken(token);
 
-  const dbUser = await UserModel.findOne({ _id: verifiedTokenData.userId });
+  const dbUser = await UserModel.findOne({ _id: verifiedTokenData.id });
 
   if (!dbUser) throw new Error("User not found");
 
