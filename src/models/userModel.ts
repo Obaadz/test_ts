@@ -8,6 +8,7 @@ export interface IUser extends Document {
   verificationCode: string;
   userName: string;
   password: string;
+  contacts: IUser[];
   compareVerificationCode(verificationCode: string): boolean;
   comparePassword(password: string): Promise<boolean>;
 }
@@ -41,6 +42,11 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
       required: true,
       lowercase: true,
       trim: true,
+    },
+    contacts: {
+      type: [Types.ObjectId],
+      ref: "User",
+      default: [],
     },
     verificationCode: {
       type: String,

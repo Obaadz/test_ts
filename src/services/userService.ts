@@ -3,6 +3,7 @@ import asyncHandler from "express-async-handler";
 import UserModel from "../models/userModel.js";
 import generateHashedString from "../utils/generateHashedString.js";
 import generateToken from "../utils/generateToken.js";
+import { RequestProtectMW } from "../middlewares/protectMW.js";
 
 export const userRegister = asyncHandler(
   async (
@@ -50,5 +51,31 @@ export const userLogin = asyncHandler(
     const token = generateToken({ id: dbUser._id });
 
     res.status(201).json({ isSuccess: true, token });
+  }
+);
+
+export const userSetContacts = asyncHandler(
+  async (req: RequestProtectMW<any, any, { contacts: string[] }>, res: Response) => {
+    const users = await UserModel.find({
+      phoneNumber: {
+        $in: req.body.contacts || [],
+      },
+    });
+
+    if (users) await UserModel.updateOne({ _id: req.dbUser._id }, { contacts: users });
+
+    res.status(201).json({ isSuccess: true });
+  }
+);
+
+export const userGetInformations = asyncHandler(
+  async (req: RequestProtectMW<any, any, { contacts: string[] }>, res: Response) => {
+    req.dbUser.populate("contacts", "-password");
+
+    req.dbUser = req.dbUser.toJSON();
+
+    delete req.dbUser.password;
+
+    res.status(201).json({ isSuccess: true, user: req.dbUser });
   }
 );
