@@ -75,6 +75,7 @@ export const userGetInformations = asyncHandler(
     req.dbUser = req.dbUser.toJSON();
 
     delete req.dbUser.password;
+    delete req.dbUser._id;
 
     res.status(201).json({ isSuccess: true, user: req.dbUser });
   }
