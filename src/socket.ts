@@ -45,14 +45,6 @@ export default class SocketServer {
     });
 
     this.io.use(async (socket: SocketProtected, next) => {
-      if (socket.dbAuth) {
-        socket.join(`auth-${socket.dbAuth._id.toJSON()}`);
-
-        return next();
-      } else if (socket.dbUser) {
-        return next();
-      }
-
       next();
     });
 
