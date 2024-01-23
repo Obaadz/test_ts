@@ -1,5 +1,6 @@
 import mongoose, { Document, Model, Schema, Types } from "mongoose";
 import bcrypt from "bcrypt";
+import { IChat } from "./chatModel.js";
 
 export interface IUser extends Document {
   fullName: string;
@@ -8,7 +9,7 @@ export interface IUser extends Document {
   verificationCode: string;
   userName: string;
   password: string;
-  contacts: IUser[];
+  contacts: (IUser & { chat?: IChat })[];
   compareVerificationCode(verificationCode: string): boolean;
   comparePassword(password: string): Promise<boolean>;
 }
@@ -44,7 +45,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
       trim: true,
     },
     contacts: {
-      type: [Types.ObjectId],
+      type: [mongoose.Schema.Types.ObjectId],
       ref: "User",
       default: [],
     },

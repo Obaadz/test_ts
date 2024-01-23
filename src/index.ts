@@ -7,6 +7,7 @@ import connectMongo from "./utils/connectMongo.js";
 import http from "http";
 import routes from "./routes/index.js";
 import globalErrorMW from "./middlewares/globalErrorMW.js";
+import SocketServer from "./socket.js";
 
 connectMongo();
 
@@ -25,6 +26,9 @@ app.use(routes);
 app.use(globalErrorMW);
 
 const server = http.createServer(app);
+const socketServer = SocketServer.getInstance(server);
+
+socketServer.startIOListeners();
 
 server.listen(process.env.PORT, async () => {
   console.log(`Listening on port ${process.env.PORT}`);

@@ -4,6 +4,7 @@ import UserModel from "../models/userModel.js";
 import generateHashedString from "../utils/generateHashedString.js";
 import generateToken from "../utils/generateToken.js";
 import { RequestProtectMW } from "../middlewares/protectMW.js";
+import ChatModel from "../models/chatModel.js";
 
 export const userRegister = asyncHandler(
   async (
@@ -77,6 +78,22 @@ export const userGetInformations = asyncHandler(
     delete req.dbUser.password;
     delete req.dbUser._id;
 
-    res.status(201).json({ isSuccess: true, user: req.dbUser });
+    req.dbUser.contacts.forEach(async (contact) => {
+      const chat = await ChatModel.findOneAndUpdate(
+        {
+          users: { $all: [req.dbUser._id, contact._id] },
+        },
+        { users: [req.dbUser._id, contact._id] },
+        {
+          upsert: true,
+          new: true,
+          projection: { users: 0 },
+        }
+      );
+
+      contact.chat = chat;
+    });
+
+    res.status(200).json({ isSuccess: true, user: req.dbUser });
   }
 );

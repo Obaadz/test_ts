@@ -3,16 +3,26 @@ import { Server, Socket } from "socket.io";
 import extractTokenFromHeader from "./utils/extractTokenFromHeader.js";
 import getUserByToken from "./utils/getUserByToken.js";
 import { IUser } from "./models/userModel.js";
+import ChatModel from "./models/chatModel.js";
 
 type SocketProtected = Socket & {
   dbUser: IUser;
 };
 
+type Message = {
+  from: string;
+  to: string;
+  content: string;
+};
+
 export default class SocketServer {
   private io: Server;
   private static instance: SocketServer;
+  private userSockets: Map<String, SocketProtected>;
 
   private constructor(httpServer: HttpServer) {
+    this.userSockets = new Map();
+
     this.io = new Server(httpServer, {
       maxHttpBufferSize: Number(process.env.MAX_BUFFER_SIZE),
       cors: {
@@ -32,19 +42,16 @@ export default class SocketServer {
       const token = socket.handshake.auth.token
         ? extractTokenFromHeader(socket.handshake.auth.token)
         : extractTokenFromHeader(socket.handshake.headers["authorization"]);
-      const lang = socket.handshake.headers["content-language"] || "ar";
 
       const dbUser = await getUserByToken(token).catch((err) => {
         return null;
       });
-      if (!dbUser) return next(new Error("Something incorrect in ws"));
+
+      if (!dbUser) return next(new Error("Something incorrect in socket.io"));
 
       socket.dbUser = dbUser;
+      this.userSockets.set(socket.dbUser._id.toJSON(), socket);
 
-      next();
-    });
-
-    this.io.use(async (socket: SocketProtected, next) => {
       next();
     });
 
@@ -55,5 +62,18 @@ export default class SocketServer {
 
   private async startListeners(socket: SocketProtected) {
     console.log("SOCKET ID CONNECTED: " + socket.id);
+
+    socket.on("sendMessage", async (message: Message) => {
+      message.from = socket.dbUser._id.toJSON();
+
+      const targetSocket = this.userSockets.get(message.to);
+
+      if (targetSocket) targetSocket.emit("newMessage", message);
+
+      await ChatModel.updateOne(
+        { users: { $all: [message.from, message.to] } },
+        { $push: { messages: message } }
+      );
+    });
   }
 }
