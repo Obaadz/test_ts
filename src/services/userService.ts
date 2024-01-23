@@ -70,7 +70,7 @@ export const userSetContacts = asyncHandler(
 
 export const userGetInformations = asyncHandler(
   async (req: RequestProtectMW<any, any, { contacts: string[] }>, res: Response) => {
-    await req.dbUser.populate("contacts", "-password -_id");
+    await req.dbUser.populate("contacts", "-password");
 
     req.dbUser = req.dbUser.toJSON();
 
