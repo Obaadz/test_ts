@@ -43,6 +43,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
       required: true,
       lowercase: true,
       trim: true,
+      unique: true,
     },
     contacts: {
       type: [mongoose.Schema.Types.ObjectId],
