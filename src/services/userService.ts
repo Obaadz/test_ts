@@ -71,27 +71,28 @@ export const userSetContacts = asyncHandler(
 
 export const userGetInformations = asyncHandler(
   async (req: RequestProtectMW<any, any, { contacts: string[] }>, res: Response) => {
-    await req.dbUser.populate("contacts", "-password");
+    await req.dbUser.populate("contacts", "-password -contacts");
 
     req.dbUser = req.dbUser.toJSON();
 
     delete req.dbUser.password;
     delete req.dbUser._id;
 
-    req.dbUser.contacts.forEach(async (contact) => {
+    for (const contact of req.dbUser.contacts) {
       const chat = await ChatModel.findOneAndUpdate(
         {
-          users: { $all: [req.dbUser._id, contact._id] },
+          users: { $all: [req.dbUser.id, contact._id] },
         },
-        { users: [req.dbUser._id, contact._id] },
+        { users: [req.dbUser.id, contact._id] },
         {
           upsert: true,
           new: true,
+          projection: { users: 0 },
         }
       );
-      console.log("debug", chat);
+
       contact.chat = chat;
-    });
+    }
 
     res.status(200).json({ isSuccess: true, user: req.dbUser });
   }
