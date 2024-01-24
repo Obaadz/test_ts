@@ -79,16 +79,13 @@ export default class SocketServer {
       const targetSocket = this.userSockets.get(message.to as any);
 
       if (targetSocket)
-        targetSocket.emit(
-          "newMessage",
-          JSON.stringify({
-            _id: message._id.toJSON(),
-            id: message._id.toJSON(),
-            from: message.from,
-            to: message.to,
-            content: message.content,
-          })
-        );
+        targetSocket.emit("newMessage", {
+          _id: message._id.toJSON(),
+          id: message._id.toJSON(),
+          from: message.from,
+          to: message.to,
+          content: message.content,
+        });
 
       await ChatModel.updateOne(
         { users: { $all: [message.from, message.to] } },
