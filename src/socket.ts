@@ -50,7 +50,9 @@ export default class SocketServer {
         return null;
       });
 
+      console.log("trying to authorize user...");
       if (!dbUser) return next(new Error("Something incorrect in socket.io"));
+      console.log("authorize success");
 
       socket.dbUser = dbUser;
       this.userSockets.set(socket.dbUser._id.toJSON(), socket);
