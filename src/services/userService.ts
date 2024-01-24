@@ -87,7 +87,6 @@ export const userGetInformations = asyncHandler(
         {
           upsert: true,
           new: true,
-          projection: { users: 0 },
         }
       );
       console.log("debug", chat);
