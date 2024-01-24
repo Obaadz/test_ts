@@ -12,6 +12,7 @@ type SocketProtected = Socket & {
 
 type Message = {
   _id: Types.ObjectId;
+  id: Types.ObjectId;
   from: string;
   to: string;
   content: string;
@@ -67,7 +68,7 @@ export default class SocketServer {
 
     socket.on("sendMessage", async (message: Message) => {
       message.from = socket.dbUser._id.toJSON();
-      message._id = new Types.ObjectId();
+      message._id = message.id = new Types.ObjectId();
 
       const targetSocket = this.userSockets.get(message.to);
 
