@@ -90,7 +90,7 @@ export const userGetInformations = asyncHandler(
           projection: { users: 0 },
         }
       );
-
+      console.log("debug", chat);
       contact.chat = chat;
     });
 
