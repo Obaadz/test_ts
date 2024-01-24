@@ -13,8 +13,8 @@ type SocketProtected = Socket & {
 type Message = {
   _id: Types.ObjectId;
   id: Types.ObjectId;
-  from: string;
-  to: string;
+  from: Types.ObjectId;
+  to: Types.ObjectId;
   content: string;
 };
 
@@ -43,8 +43,6 @@ export default class SocketServer {
 
   public startIOListeners() {
     this.io.use(async (socket: SocketProtected, next) => {
-      console.log("T", socket.handshake.query.authorization);
-      console.log("T2", socket.handshake.query.Authorization);
       const token = extractTokenFromHeader(
         socket.handshake.query.authorization ||
           socket.handshake.query.Authorization ||
@@ -78,9 +76,19 @@ export default class SocketServer {
       message.from = socket.dbUser._id.toJSON();
       message._id = message.id = new Types.ObjectId();
 
-      const targetSocket = this.userSockets.get(message.to);
+      const targetSocket = this.userSockets.get(message.to as any);
 
-      if (targetSocket) targetSocket.emit("newMessage", message);
+      if (targetSocket)
+        targetSocket.emit(
+          "newMessage",
+          JSON.stringify({
+            _id: message._id.toJSON(),
+            id: message._id.toJSON(),
+            from: message.from,
+            to: message.to,
+            content: message.content,
+          })
+        );
 
       await ChatModel.updateOne(
         { users: { $all: [message.from, message.to] } },
