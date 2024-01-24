@@ -42,6 +42,7 @@ export default class SocketServer {
 
   public startIOListeners() {
     this.io.use(async (socket: SocketProtected, next) => {
+      console.log("T", socket.handshake.query);
       const token = socket.handshake.auth.token
         ? extractTokenFromHeader(socket.handshake.auth.token)
         : extractTokenFromHeader(socket.handshake.headers["authorization"]);
