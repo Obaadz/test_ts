@@ -7,7 +7,7 @@ export interface IChat extends Document {
     content: string;
     from: Types.ObjectId | IUser;
   }[];
-  unreadFor: Types.ObjectId[] | IUser[];
+  //   unreadFor: Types.ObjectId[] | IUser[];
 }
 
 export interface IChatModel extends Model<IChat> {}
@@ -36,11 +36,11 @@ const chatSchema: Schema<IChat> = new mongoose.Schema(
       ],
       default: [],
     },
-    unreadFor: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: "User",
-      default: [],
-    },
+    // unreadFor: {
+    //   type: [mongoose.Schema.Types.ObjectId],
+    //   ref: "User",
+    //   default: [],
+    // },
     __v: {
       type: Number,
       select: false,
