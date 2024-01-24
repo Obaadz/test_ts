@@ -8,6 +8,7 @@ import http from "http";
 import routes from "./routes/index.js";
 import globalErrorMW from "./middlewares/globalErrorMW.js";
 import SocketServer from "./socket.js";
+import { Types } from "mongoose";
 
 connectMongo();
 

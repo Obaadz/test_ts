@@ -4,12 +4,14 @@ import extractTokenFromHeader from "./utils/extractTokenFromHeader.js";
 import getUserByToken from "./utils/getUserByToken.js";
 import { IUser } from "./models/userModel.js";
 import ChatModel from "./models/chatModel.js";
+import { Types } from "mongoose";
 
 type SocketProtected = Socket & {
   dbUser: IUser;
 };
 
 type Message = {
+  _id: Types.ObjectId;
   from: string;
   to: string;
   content: string;
@@ -65,6 +67,7 @@ export default class SocketServer {
 
     socket.on("sendMessage", async (message: Message) => {
       message.from = socket.dbUser._id.toJSON();
+      message._id = new Types.ObjectId();
 
       const targetSocket = this.userSockets.get(message.to);
 
