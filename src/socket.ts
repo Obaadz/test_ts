@@ -27,6 +27,7 @@ export default class SocketServer {
     this.userSockets = new Map();
 
     this.io = new Server(httpServer, {
+      allowEIO3: true,
       maxHttpBufferSize: Number(process.env.MAX_BUFFER_SIZE),
       cors: {
         origin: "*",
