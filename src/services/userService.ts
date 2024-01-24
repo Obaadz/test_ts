@@ -81,7 +81,7 @@ export const userGetInformations = asyncHandler(
     for (const contact of req.dbUser.contacts) {
       const chat = await ChatModel.findOneAndUpdate(
         {
-          users: { $all: [req.dbUser.id, contact._id] },
+          $or: [{ users: [req.dbUser.id, contact._id] }, { users: [contact._id, req.dbUser.id] }],
         },
         { users: [req.dbUser.id, contact._id] },
         {
