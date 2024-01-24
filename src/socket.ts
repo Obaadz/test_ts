@@ -45,9 +45,12 @@ export default class SocketServer {
     this.io.use(async (socket: SocketProtected, next) => {
       console.log("T", socket.handshake.query.authorization);
       console.log("T2", socket.handshake.query.Authorization);
-      const token = socket.handshake.auth.token
-        ? extractTokenFromHeader(socket.handshake.auth.token)
-        : extractTokenFromHeader(socket.handshake.headers["authorization"]);
+      const token = extractTokenFromHeader(
+        socket.handshake.query.authorization ||
+          socket.handshake.query.Authorization ||
+          socket.handshake.auth.token ||
+          socket.handshake.headers["authorization"]
+      );
 
       const dbUser = await getUserByToken(token).catch((err) => {
         return null;
