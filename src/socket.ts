@@ -45,9 +45,9 @@ export default class SocketServer {
     this.io.use(async (socket: SocketProtected, next) => {
       const token = extractTokenFromHeader(
         socket.handshake.query.authorization ||
-          socket.handshake.query.Authorization ||
-          socket.handshake.auth.token ||
-          socket.handshake.headers["authorization"]
+        socket.handshake.query.Authorization ||
+        socket.handshake.auth.token ||
+        socket.handshake.headers["authorization"]
       );
 
       const dbUser = await getUserByToken(token).catch((err) => {
@@ -86,6 +86,14 @@ export default class SocketServer {
           to: message.to,
           content: message.content,
         });
+
+      // socket.emit("newMessage", {
+      //   _id: message._id.toJSON(),
+      //   id: message._id.toJSON(),
+      //   from: message.from,
+      //   to: message.to,
+      //   content: message.content,
+      // });
 
       await ChatModel.updateOne(
         { users: { $all: [message.from, message.to] } },

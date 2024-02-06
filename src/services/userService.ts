@@ -31,9 +31,10 @@ export const userRegister = asyncHandler(
       userName: req.body.userName,
     });
 
-    const token = generateToken({ id: dbUser._id });
+    const accessToken = generateToken({ id: dbUser._id }, "5m");
+    const refreshToken = generateToken({ id: dbUser._id }, "30d");
 
-    res.status(201).json({ isSuccess: true, token });
+    res.status(201).json({ isSuccess: true, token: accessToken, accessToken, refreshToken });
   }
 );
 
@@ -49,9 +50,10 @@ export const userLogin = asyncHandler(
     if (!dbUser || !(await dbUser.comparePassword(req.body.password)))
       throw new Error("Email or user name or password is incorrect");
 
-    const token = generateToken({ id: dbUser._id });
+    const accessToken = generateToken({ id: dbUser._id }, "5m");
+    const refreshToken = generateToken({ id: dbUser._id }, "30d");
 
-    res.status(201).json({ isSuccess: true, token });
+    res.status(201).json({ isSuccess: true, token: accessToken, accessToken, refreshToken });
   }
 );
 
@@ -95,5 +97,14 @@ export const userGetInformations = asyncHandler(
     }
 
     res.status(200).json({ isSuccess: true, user: req.dbUser });
+  }
+);
+
+export const userRefreshToken = asyncHandler(
+  async (req: RequestProtectMW<any, any, { contacts: string[] }>, res: Response) => {
+    const accessToken = generateToken({ id: req.dbUser._id }, "5m");
+    const refreshToken = generateToken({ id: req.dbUser._id }, "30d");
+
+    res.status(201).json({ isSuccess: true, token: accessToken, accessToken, refreshToken });
   }
 );
