@@ -15,7 +15,9 @@ export type RequestProtectMW<
 };
 
 export default asyncHandler(async (req: RequestProtectMW, res: Response, next: NextFunction) => {
+  console.log("DEBUG1", req.headers.authorization)
   const token = extractTokenFromHeader(req.headers.authorization);
+  console.log("DEBUG2", token)
 
   const dbUser = await getUserByToken(token);
 
